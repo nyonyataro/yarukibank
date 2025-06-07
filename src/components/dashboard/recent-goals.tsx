@@ -1,7 +1,11 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { CheckInDialog } from '@/components/check-ins/check-in-dialog'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { Target } from 'lucide-react'
@@ -34,11 +38,13 @@ const categoryLabels: Record<string, string> = {
 }
 
 export function RecentGoals({ goals }: RecentGoalsProps) {
+  const [quickCheckInGoal, setQuickCheckInGoal] = useState<string | null>(null)
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>現在の目標</CardTitle>
-        <CardDescription>進行中の目標の一覧です</CardDescription>
+        <CardTitle>今日のチェックイン</CardTitle>
+        <CardDescription>アクティブな目標への進捗報告</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {goals.length === 0 ? (
@@ -51,8 +57,8 @@ export function RecentGoals({ goals }: RecentGoalsProps) {
               新しい目標を作成して、達成に向けて行動を開始しましょう
             </p>
             <Button asChild>
-              <Link href="/goals/new">
-                最初の目標を作成
+              <Link href="/goals">
+                目標を作成する
               </Link>
             </Button>
           </div>
@@ -73,18 +79,37 @@ export function RecentGoals({ goals }: RecentGoalsProps) {
                   <Badge variant="outline">
                     ¥{goal.penalty_amount.toLocaleString()}
                   </Badge>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setQuickCheckInGoal(goal.id)}
+                  >
+                    チェックイン
+                  </Button>
                 </div>
               </div>
             ))}
             
-            <div className="pt-4">
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/goals">すべての目標を見る</Link>
+            <div className="pt-4 text-center">
+              <Button asChild variant="outline" size="sm">
+                <Link href="/goals">目標を管理する</Link>
               </Button>
             </div>
           </>
         )}
       </CardContent>
+
+      {quickCheckInGoal && (
+        <CheckInDialog
+          goalId={quickCheckInGoal}
+          open={!!quickCheckInGoal}
+          onOpenChange={() => setQuickCheckInGoal(null)}
+          onSuccess={() => {
+            window.location.reload()
+            setQuickCheckInGoal(null)
+          }}
+        />
+      )}
     </Card>
   )
 }

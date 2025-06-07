@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { Plus, Target, Calendar, Coins } from 'lucide-react'
+import { CheckInDialog } from '@/components/check-ins/check-in-dialog'
 
 interface Goal {
   id: string
@@ -47,6 +48,7 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('active')
+  const [quickCheckInGoal, setQuickCheckInGoal] = useState<string | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -161,11 +163,20 @@ export default function GoalsPage() {
                 <span className="text-sm text-gray-600">
                   残り {daysRemaining} 日
                 </span>
-                <Button asChild size="sm">
-                  <Link href={`/goals/${goal.id}`}>
-                    詳細を見る
-                  </Link>
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setQuickCheckInGoal(goal.id)}
+                  >
+                    チェックイン
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href={`/goals/${goal.id}`}>
+                      詳細
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </>
           )}
@@ -240,8 +251,8 @@ export default function GoalsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">目標一覧</h1>
-            <p className="text-gray-600 mt-2">あなたの目標を管理しましょう</p>
+            <h1 className="text-3xl font-bold text-gray-900">目標管理</h1>
+            <p className="text-gray-600 mt-2">目標の作成・編集・履歴確認</p>
           </div>
           <Button asChild>
             <Link href="/goals/new">
@@ -342,6 +353,18 @@ export default function GoalsPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {quickCheckInGoal && (
+        <CheckInDialog
+          goalId={quickCheckInGoal}
+          open={!!quickCheckInGoal}
+          onOpenChange={() => setQuickCheckInGoal(null)}
+          onSuccess={() => {
+            fetchGoals()
+            setQuickCheckInGoal(null)
+          }}
+        />
+      )}
     </MainLayout>
   )
 }

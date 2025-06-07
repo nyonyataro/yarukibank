@@ -190,14 +190,11 @@ export function CheckInDialog({ goalId, open, onOpenChange, onSuccess }: CheckIn
                   <FormLabel>メモ（任意）</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="感想、気づき、課題などがあれば記入してください"
-                      rows={3}
+                      placeholder="今日の取り組みについて一言"
+                      rows={2}
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    今日の振り返りや明日への意気込みなど
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

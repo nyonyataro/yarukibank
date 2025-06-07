@@ -203,7 +203,7 @@ export function GoalDetail({ goal, checkIns }: GoalDetailProps) {
               <CardTitle className="flex items-center justify-between">
                 チェックイン履歴
                 {goal.status === 'active' && (
-                  <Button size="sm" onClick={() => setCheckInDialogOpen(true)}>
+                  <Button size="sm" variant="secondary" onClick={() => setCheckInDialogOpen(true)}>
                     <Plus className="w-4 h-4 mr-2" />
                     チェックイン
                   </Button>
@@ -224,54 +224,52 @@ export function GoalDetail({ goal, checkIns }: GoalDetailProps) {
                     進捗を報告してみましょう
                   </p>
                   {goal.status === 'active' && (
-                    <Button onClick={() => setCheckInDialogOpen(true)}>
+                    <Button variant="secondary" onClick={() => setCheckInDialogOpen(true)}>
                       <Plus className="w-4 h-4 mr-2" />
                       最初のチェックイン
                     </Button>
                   )}
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>日時</TableHead>
-                      <TableHead>証拠タイプ</TableHead>
-                      <TableHead>ステータス</TableHead>
-                      <TableHead>メモ</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {checkIns.map((checkIn) => (
-                      <TableRow key={checkIn.id}>
-                        <TableCell>
-                          {format(new Date(checkIn.checked_at), 'M/d HH:mm', { locale: ja })}
-                        </TableCell>
-                        <TableCell>
-                          {checkIn.evidence_type ? (
-                            <Badge variant="outline">
-                              {checkIn.evidence_type === 'photo' && '写真'}
-                              {checkIn.evidence_type === 'number' && '数値'}
-                              {checkIn.evidence_type === 'text' && 'テキスト'}
-                            </Badge>
-                          ) : (
-                            <span className="text-gray-400">なし</span>
+                <div className="space-y-3">
+                  {checkIns.map((checkIn) => (
+                    <div key={checkIn.id} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-medium">
+                          {format(new Date(checkIn.checked_at), 'M月d日 HH:mm', { locale: ja })}
+                        </div>
+                        <Badge 
+                          variant="secondary" 
+                          className={getStatusColor(checkIn.status)}
+                        >
+                          {statusLabels[checkIn.status]}
+                        </Badge>
+                      </div>
+                      
+                      {checkIn.evidence_data && (
+                        <div className="text-sm text-gray-700 mb-2">
+                          <span className="font-medium">報告内容: </span>
+                          {checkIn.evidence_type === 'number' && (
+                            <span>{checkIn.evidence_data.value}</span>
                           )}
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant="secondary" 
-                            className={getStatusColor(checkIn.status)}
-                          >
-                            {statusLabels[checkIn.status]}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {checkIn.notes || <span className="text-gray-400">なし</span>}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                          {checkIn.evidence_type === 'text' && (
+                            <span>{checkIn.evidence_data.value}</span>
+                          )}
+                          {checkIn.evidence_type === 'photo' && (
+                            <span>写真が添付されました</span>
+                          )}
+                        </div>
+                      )}
+                      
+                      {checkIn.notes && (
+                        <div className="text-sm text-gray-600">
+                          <span className="font-medium">メモ: </span>
+                          {checkIn.notes}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>
@@ -327,6 +325,7 @@ export function GoalDetail({ goal, checkIns }: GoalDetailProps) {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button 
+                  variant="secondary"
                   className="w-full" 
                   onClick={() => setCheckInDialogOpen(true)}
                 >
